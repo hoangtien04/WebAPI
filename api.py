@@ -343,6 +343,32 @@ def sua_san_pham(MaSP: int, TenSP: str = None, DonGia: int = None, MoTa: str = N
     else:
         return {"message": f"Lỗi kết nối: {conn}"}
 
+#Get sanpham productlistcard
+@app.get("/sanphamcard")
+def get_san_pham_card():
+    conn = db.connect_to_database()
+    if not isinstance(conn, Error):
+        cursor = conn.cursor()
+        sql = "SELECT sanpham.MaSP, sanpham.TenSP, sanpham.DonGia,`DuongDan` FROM `hinhanh` join `sanpham` on hinhanh.MaSP = sanpham.MaSP"
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+        data = []
+        for row in rows:
+            data.append(
+                {
+                    "MaSP": row[0],
+                    "TenSP": row[1],
+                    "DonGia": row[2],
+                    "DuongDan": row[3],
+                }
+            )
+        # Đóng con trỏ và kết nối
+        cursor.close()
+        conn.close()
+        return data
+    else:
+        print(f"Lỗi kết nối: {conn}")
+
 #Get sanpham theo MaSP
 @app.get("/sanpham/{MaSP}")
 def get_san_pham_by_id(MaSP: int):
