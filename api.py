@@ -321,7 +321,7 @@ def get_san_pham_card():
     conn = db.connect_to_database()
     if not isinstance(conn, Error):
         cursor = conn.cursor()
-        sql = "SELECT sanpham.MaSP, sanpham.TenSP,loaisanpham.TenLoai, sanpham.DonGia,`DuongDan` FROM `hinhanh` join `sanpham` on hinhanh.MaSP = sanpham.MaSP join loaisanpham on loaisanpham.MaLoai = sanpham.MaLoai"
+        sql = "SELECT sanpham.MaSP, sanpham.TenSP,loaisanpham.TenLoai, sanpham.DonGia,`DuongDan` FROM `hinhanh` join `sanpham` on hinhanh.MaSP = sanpham.MaSP join loaisanpham on loaisanpham.MaLoai = sanpham.MaLoai where hinhanh.Avatar = 1"
         cursor.execute(sql)
         rows = cursor.fetchall()
         data = []
@@ -619,7 +619,7 @@ def get_san_pham_detail(MaSP: int):
     conn = db.connect_to_database()
     if not isinstance(conn, Error):
         cursor = conn.cursor()
-        sql = "select sanpham.MaSP,sanpham.TenSP,loaisanpham.TenLoai,hinhanh.DuongDan,sanpham.DonGia,sanpham.MoTa from sanpham join loaisanpham on sanpham.MaLoai = loaisanpham.MaLoai join hinhanh on sanpham.MaSP = hinhanh.MaSP where sanpham.MaSP = %s;"
+        sql = "select sanpham.MaSP,sanpham.TenSP,loaisanpham.TenLoai,hinhanh.DuongDan,sanpham.DonGia,sanpham.MoTa from sanpham join loaisanpham on sanpham.MaLoai = loaisanpham.MaLoai join hinhanh on sanpham.MaSP = hinhanh.MaSP where sanpham.MaSP = %s and hinhanh.Avatar = 1;"
         cursor.execute(sql, (MaSP,))
         row = cursor.fetchone()
         if row:
@@ -776,7 +776,7 @@ def get_all_san_pham(MaND:int):
     conn = db.connect_to_database()
     if not isinstance(conn, Error):
         cursor = conn.cursor()
-        sql = "SELECT sanpham.MaSP,sanpham.TenSP,hinhanh.DuongDan,sanpham.DonGia,sanpham.MoTa,loaisanpham.TenLoai FROM sanpham join loaisanpham on loaisanpham.MaLoai = sanpham.MaLoai join hinhanh on hinhanh.MaSP = sanpham.MaSP join danhsachyt on danhsachyt.MaSP = sanpham.MaSP where danhsachyt.MaND = %s;"
+        sql = "SELECT sanpham.MaSP,sanpham.TenSP,hinhanh.DuongDan,sanpham.DonGia,sanpham.MoTa,loaisanpham.TenLoai FROM sanpham join loaisanpham on loaisanpham.MaLoai = sanpham.MaLoai join hinhanh on hinhanh.MaSP = sanpham.MaSP join danhsachyt on danhsachyt.MaSP = sanpham.MaSP where danhsachyt.MaND = %s and hinhanh.Avatar = 1;"
         cursor.execute(sql,(MaND,))
         rows = cursor.fetchall()
         data = []
@@ -876,7 +876,7 @@ def get_all_san_pham(MaND:int):
     conn = db.connect_to_database()
     if not isinstance(conn, Error):
         cursor = conn.cursor()
-        sql = "SELECT ctsanpham.MaSP,sanpham.TenSP,hinhanh.DuongDan,size.Size,mausac.TenMau,sanpham.DonGia,giohang.SoLuong FROM `giohang` join ctsanpham on giohang.MaCTSP = ctsanpham.MaCTSP join sanpham on ctsanpham.MaSP = sanpham.MaSP join hinhanh on hinhanh.MaSP = ctsanpham.MaSP join size on size.MaSize = ctsanpham.MaSize join mausac on ctsanpham.MaMau = mausac.MaMau where MaND = %s and hinhanh.Avatar = 1;"
+        sql = "SELECT ctsanpham.MaSP,ctsanpham.MaCTSP,sanpham.TenSP,hinhanh.DuongDan,size.Size,mausac.TenMau,sanpham.DonGia,giohang.SoLuong FROM `giohang` join ctsanpham on giohang.MaCTSP = ctsanpham.MaCTSP join sanpham on ctsanpham.MaSP = sanpham.MaSP join hinhanh on hinhanh.MaSP = ctsanpham.MaSP join size on size.MaSize = ctsanpham.MaSize join mausac on ctsanpham.MaMau = mausac.MaMau where MaND = %s and hinhanh.Avatar = 1;"
         cursor.execute(sql,(MaND,))
         rows = cursor.fetchall()
         data = []
@@ -884,12 +884,13 @@ def get_all_san_pham(MaND:int):
             data.append(
                 {
                     "MaSP": row[0],
-                    "TenSP": row[1],
-                    "DuongDan": row[2],
-                    "Size": row[3],
-                    "TenMau": row[4],
-                    "DonGia": row[5],
-                    "SoLuong": row[6],
+                    "MaCTSP": row[1],
+                    "TenSP": row[2],
+                    "DuongDan": row[3],
+                    "Size": row[4],
+                    "TenMau": row[5],
+                    "DonGia": row[6],
+                    "SoLuong": row[7],
                 }
             )
         # Đóng con trỏ và kết nối
@@ -1068,7 +1069,7 @@ def get_all_san_pham():
     conn = db.connect_to_database()
     if not isinstance(conn, Error):
         cursor = conn.cursor()
-        sql = "SELECT * FROM `hinhanh`"
+        sql = "SELECT distinct * FROM `hinhanh`"
         cursor.execute(sql)
         rows = cursor.fetchall()
         data = []
@@ -1125,7 +1126,7 @@ def get_all_san_pham(MaND:int,trangthai:int):
     conn = db.connect_to_database()
     if not isinstance(conn, Error):
         cursor = conn.cursor()
-        sql = "SELECT * FROM `donhang` WHERE MaND = %s and MaDC = %s;"
+        sql = "SELECT * FROM `donhang` WHERE MaND = %s and TrangThaiDH = %s;"
         cursor.execute(sql,(MaND,trangthai,))
         rows = cursor.fetchall()
         data = []
@@ -1332,3 +1333,176 @@ def get_all_san_pham(TaiKhoan:str):
         return data
     else:
         print(f"Lỗi kết nối: {conn}")
+
+@app.get("/donhang/ctdonhang/{MaDH}")
+def get_all_san_pham(MaDH:int):
+    conn = db.connect_to_database()
+    if not isinstance(conn, Error):
+        cursor = conn.cursor()
+        sql = "SELECT ctsanpham.MaSP,sanpham.TenSP,sanpham.DonGia,sanpham.MoTa,size.Size,mausac.TenMau,hinhanh.DuongDan,ctdonhang.SoLuong,ctdonhang.TongTien FROM `ctdonhang` join ctsanpham on ctdonhang.MaCTSP = ctsanpham.MaCTSP join sanpham on ctsanpham.MaSP = sanpham.MaSP join hinhanh on hinhanh.MaSP = ctsanpham.MaSP join size on size.MaSize = ctsanpham.MaSize join mausac on ctsanpham.MaMau = mausac.MaMau where MaDH = %s and hinhanh.Avatar = 1;"
+        cursor.execute(sql,(MaDH,))
+        rows = cursor.fetchall()
+        data = []
+        for row in rows:
+            data.append(
+                {
+                    "MaSP": row[0],
+                    "TenSP": row[1],
+                    "DonGia": row[2],
+                    "MoTa": row[3],
+                    "Size": row[4],
+                    "TenMau": row[5],
+                    "DuongDan": row[6],
+                    "SoLuong": row[7],
+                    "TongTien": row[8],
+                }
+            )
+        # Đóng con trỏ và kết nối
+        cursor.close()
+        conn.close()
+        return data
+    else:
+        print(f"Lỗi kết nối: {conn}")
+
+@app.delete("/giohang/{MaND}/{MaCTSP}")
+def xoa_loai_san_pham(MaND: int,MaCTSP:int):
+    conn = db.connect_to_database()
+    if not isinstance(conn, Error):
+        cursor = conn.cursor()
+
+        try:
+            # Xóa loại sản phẩm
+            sql = "DELETE FROM giohang WHERE MaND = %s and MaCTSP = %s"
+            cursor.execute(sql, (MaND,MaCTSP,))
+            conn.commit()
+
+            # Kiểm tra số dòng dữ liệu bị xoá
+            if cursor.rowcount == 0:
+                conn.close()
+                return {"message": "Không tìm thấy loại sản phẩm để xóa."}
+
+            # Đóng kết nối
+            cursor.close()
+            conn.close()
+
+            return {"message": "Xóa loại sản phẩm thành công."}
+        except Error as e:
+            conn.close()
+            return {"message": "Xóa loại sản phẩm thất bại: " + str(e)}
+    else:
+        return {"message": f"Lỗi kết nối: {conn}"}
+
+class themdonhang(BaseModel):
+    MaND:int
+    MaDC:int
+    NgayDat:str
+    NgayTT:str
+    TongTien:int
+    PhuongThucTT:str
+
+@app.post("/themdonhang/")
+def them_loai_san_pham(themDonHang:themdonhang):
+    conn = db.connect_to_database()
+    if not isinstance(conn, Error):
+        cursor = conn.cursor()
+
+        try:
+            # Thêm loại sản phẩm
+            sql = "INSERT INTO `donhang`(`MaND`, `MaDC`, `NgayDat`, `NgayTT`, `TongTien`, `PhuongThucTT`, `TrangThaiTT`, `TrangThaiDH`) VALUES (%s,%s,%s,%s,%s,%s,'CHUA THANH TOAN','1')"
+            cursor.execute(sql, (themDonHang.MaND,themDonHang.MaDC,themDonHang.NgayDat,themDonHang.NgayTT,themDonHang.TongTien,themDonHang.PhuongThucTT,))
+            conn.commit()
+
+            # Đóng kết nối
+            cursor.close()
+            conn.close()
+
+            return {"message": "Thêm loại sản phẩm thành công."}
+        except Error as e:
+            conn.close()
+            return {"message": "Thêm loại sản phẩm thất bại: " + str(e)}
+    else:
+        return {"message": f"Lỗi kết nối: {conn}"}
+
+
+
+@app.get("/donhang/madonhang")
+def get_san_pham_by_id():
+    conn = db.connect_to_database()
+    if not isinstance(conn, Error):
+        cursor = conn.cursor()
+        sql = "SELECT MAX(MaDH) FROM `donhang`;"
+        cursor.execute(sql)
+        row = cursor.fetchone()
+        if row:
+            data = {
+                "MaDH": row[0],
+            }
+            # Đóng con trỏ và kết nối
+            cursor.close()
+            conn.close()
+            return data
+        else:
+            cursor.close()
+            conn.close()
+            return {"message": "Không tìm thấy sản phẩm."}
+    else:
+        print(f"Lỗi kết nối: {conn}")
+
+@app.get("/diachigh/{MaND}")
+def get_all_san_pham(MaND:int):
+    conn = db.connect_to_database()
+    if not isinstance(conn, Error):
+        cursor = conn.cursor()
+        sql = "SELECT * FROM `diachigh` WHERE MaND = %s;"
+        cursor.execute(sql,(MaND,))
+        rows = cursor.fetchall()
+        data = []
+        for row in rows:
+            data.append(
+                {
+                    "MaDC": row[0],
+                    "MaND": row[1],
+                    "NguoiNhan": row[2],
+                    "SDT": row[3],
+                    "DiaChiMD": row[4],
+                    "TinhThanh": row[5],
+                    "QuanHuyen": row[6],
+                    "PhuongXa": row[7],
+                    "CTDiaChi": row[8],
+                }
+            )
+        # Đóng con trỏ và kết nối
+        cursor.close()
+        conn.close()
+        return data
+    else:
+        print(f"Lỗi kết nối: {conn}")
+
+
+@app.delete("/xoagiohang/{MaND}")
+def xoa_loai_san_pham(MaND: int):
+    conn = db.connect_to_database()
+    if not isinstance(conn, Error):
+        cursor = conn.cursor()
+
+        try:
+            # Xóa loại sản phẩm
+            sql = "DELETE FROM `giohang` WHERE MaND = %s;"
+            cursor.execute(sql, (MaND,))
+            conn.commit()
+
+            # Kiểm tra số dòng dữ liệu bị xoá
+            if cursor.rowcount == 0:
+                conn.close()
+                return {"message": "Không tìm thấy loại sản phẩm để xóa."}
+
+            # Đóng kết nối
+            cursor.close()
+            conn.close()
+
+            return {"message": "Xóa loại sản phẩm thành công."}
+        except Error as e:
+            conn.close()
+            return {"message": "Xóa loại sản phẩm thất bại: " + str(e)}
+    else:
+        return {"message": f"Lỗi kết nối: {conn}"}
